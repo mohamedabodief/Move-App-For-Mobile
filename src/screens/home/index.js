@@ -6,7 +6,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Details from '../../screens/details';
 import Entypo from '@expo/vector-icons/Entypo';
 import { StyleSheet } from 'react-native';
-
+import Search from '../search';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 const Tab = createBottomTabNavigator();
 export function BottomTabNavigator() {
   return (
@@ -40,6 +41,17 @@ export function BottomTabNavigator() {
           tabBarLabel: 'Details',
         }}
       />
+       <Tab.Screen
+        name="Search"
+        component={Search}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+         <FontAwesome5 name="search" size={24} color={color} />
+          ),
+          tabBarLabel: 'Search',
+        }}
+      />
     </Tab.Navigator>
   );
 }
@@ -60,3 +72,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
 });
+
+
