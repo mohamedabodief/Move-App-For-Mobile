@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,10 +7,10 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { FontAwesome } from "@expo/vector-icons";
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { FontAwesome } from '@expo/vector-icons';
 
 export default function WatchList() {
   const navigation = useNavigation();
@@ -21,12 +21,12 @@ export default function WatchList() {
   useEffect(() => {
     const getFavorites = async () => {
       try {
-        const storedFavorites = await AsyncStorage.getItem("favorites");
+        const storedFavorites = await AsyncStorage.getItem('favorites');
         if (storedFavorites) {
           setFavorites(JSON.parse(storedFavorites));
         }
       } catch (error) {
-        console.error("Error loading favorites:", error);
+        console.error('Error loading favorites:', error);
       } finally {
         setLoading(false);
       }
@@ -41,30 +41,26 @@ export default function WatchList() {
       const updatedFavorites = favorites.filter(
         (movie) => movie.id !== movieId
       );
-      await AsyncStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+      await AsyncStorage.setItem('favorites', JSON.stringify(updatedFavorites));
       setFavorites(updatedFavorites);
     } catch (error) {
-      console.error("Error removing favorite:", error);
+      console.error('Error removing favorite:', error);
     }
   };
 
   // Render each favorite movie card
   const renderMovieCard = ({ item }) => {
     const formattedDate = new Date(item.release_date).toLocaleDateString(
-      "en-US",
+      'en-US',
       {
-        year: "numeric",
-        month: "short",
-        day: "2-digit",
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
       }
     );
 
     return (
-      <TouchableOpacity
-        style={styles.movieCard}
-        onPress={() => handleRemoveFavorite(item.id)}
-        activeOpacity={0.7}
-      >
+      <View style={styles.movieCard}>
         <Image
           source={{
             uri: `https://image.tmdb.org/t/p/w500/${item.poster_path}`,
@@ -76,11 +72,16 @@ export default function WatchList() {
             <Text style={styles.movieTitle} numberOfLines={1}>
               {item.title}
             </Text>
-            <FontAwesome name="heart" size={16} color="#FF0000" />
+            <TouchableOpacity
+              onPress={() => handleRemoveFavorite(item.id)}
+              activeOpacity={0.7}
+            >
+              <FontAwesome name="heart" size={16} color="#FF0000" />
+            </TouchableOpacity>
           </View>
           <Text style={styles.movieDate}>{formattedDate}</Text>
         </View>
-      </TouchableOpacity>
+      </View>
     );
   };
 
@@ -103,13 +104,13 @@ export default function WatchList() {
       ) : favorites.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Image
-            source={require("../../../assets/icon.jpg")}
+            source={require('../../../assets/icon.jpg')}
             style={styles.emptyImage}
           />
           <Text style={styles.emptyText}>No Movies in watch list</Text>
           <TouchableOpacity
             style={styles.homeButton}
-            onPress={() => navigation.navigate("Home")}
+            onPress={() => navigation.navigate('Home')}
           >
             <Text style={styles.homeButtonText}>Back to home</Text>
           </TouchableOpacity>
@@ -131,28 +132,28 @@ export default function WatchList() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     paddingTop: 50,
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: '#eee',
   },
   backButton: {
     marginRight: 15,
   },
   title: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 20,
   },
   emptyImage: {
@@ -164,59 +165,59 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 18,
     marginBottom: 20,
-    textAlign: "center",
+    textAlign: 'center',
   },
   homeButton: {
-    backgroundColor: "#FFE353",
+    backgroundColor: '#FFE353',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 5,
   },
   homeButtonText: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   listContent: {
     paddingHorizontal: 10,
     padding: 20,
   },
   columnWrapper: {
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
     marginBottom: 15,
   },
   movieCard: {
-    width: Dimensions.get("window").width / 2 - 20,
-    backgroundColor: "#f8f8f8",
+    width: Dimensions.get('window').width / 2 - 20,
+    backgroundColor: '#f8f8f8',
     borderRadius: 10,
-    overflow: "hidden",
+    overflow: 'hidden',
     elevation: 3,
   },
   movieImage: {
-    width: "100%",
+    width: '100%',
     height: 200,
-    resizeMode: "cover",
+    resizeMode: 'cover',
   },
   movieInfo: {
     padding: 10,
   },
   titleRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 5,
   },
   movieTitle: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     flex: 1,
     marginRight: 8,
   },
   movieDate: {
     fontSize: 12,
-    color: "#666",
+    color: '#666',
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

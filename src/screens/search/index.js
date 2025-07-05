@@ -70,9 +70,9 @@ function Search() {
         onEndReachedThreshold={0.7}
       />
 
-      {endReached && movies.length > 0 && (
+      {/* {endReached && movies.length > 0 && (
         <Text style={styles.endText}>No more results</Text>
-      )}
+      )} */}
 
       {!loading && searchWord.trim() !== '' && movies.length === 0 && (
         <Text style={styles.noResults}>Not found</Text>
