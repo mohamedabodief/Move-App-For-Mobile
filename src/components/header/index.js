@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesome, AntDesign } from '@expo/vector-icons';
 
@@ -19,16 +19,17 @@ export default function Header() {
 
   return (
     <View style={styles.navbar}>
+      <StatusBar backgroundColor={'#FFE353'} barStyle={`dark-content`}/>
       <Text style={styles.brand}>Movie App</Text>
 
       <View style={styles.navItems}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+        {/* <TouchableOpacity onPress={() => navigation.navigate('Home')}>
           <Text style={styles.navLink}>Home</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => navigation.navigate('Details')}>
           <Text style={styles.navLink}>Product</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       <View style={styles.rightItems}>
@@ -123,5 +124,4 @@ watchlist: {
   flexDirection: 'row',
   alignItems: 'center',
 },
-
 });
