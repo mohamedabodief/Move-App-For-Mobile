@@ -109,6 +109,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     rowGap: 10,
+    paddingTop: StatusBar.currentHeight,
   },
   brand: {
     fontWeight: "bold",

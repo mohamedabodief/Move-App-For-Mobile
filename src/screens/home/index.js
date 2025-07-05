@@ -31,23 +31,12 @@ export function BottomTabNavigator() {
         }}
       />
       <Tab.Screen
-        name="Details"
-        component={Details}
-        options={{
-          headerShown: false,
-          tabBarIcon: ({ color, size }) => (
-            <Entypo name="info-with-circle" size={size} color={color} />
-          ),
-          tabBarLabel: 'Details',
-        }}
-      />
-       <Tab.Screen
         name="Search"
         component={Search}
         options={{
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
-         <FontAwesome5 name="search" size={24} color={color} />
+            <FontAwesome5 name="search" size={24} color={color} />
           ),
           tabBarLabel: 'Search',
         }}
@@ -58,7 +47,7 @@ export function BottomTabNavigator() {
 
 export default function Home() {
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={[]}>
       <Header />
       <RenderHomeCards />
     </SafeAreaView>
@@ -72,5 +61,3 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
 });
-
-
