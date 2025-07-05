@@ -1,40 +1,90 @@
-import React, { useState, useEffect } from 'react'
-import { SafeAreaView, StyleSheet, TextInput, TouchableOpacity, View, Text, FlatList, ActivityIndicator } from 'react-native'
-import MovieCard from '../../components/MovieCard/MovieCard'
+import React, { useState, useEffect, useRef } from 'react';
+import { SafeAreaView, StyleSheet, TextInput, TouchableOpacity, View, Text, FlatList, ActivityIndicator } from 'react-native';
+import MovieCard from '../../components/MovieCard/MovieCard';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function Search() {
-  const [searchWord, setSearchWord] = useState("")
-  const [movies, setMovies] = useState([])
-  const [endReached, setEndReached] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const navigation = useNavigation();
+  const [searchWord, setSearchWord] = useState("");
+  const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [favoriteMovieIds, setFavoriteMovieIds] = useState(new Set());
 
-  const handelSearch = async () => {
-    if (searchWord.trim().length < 1) {
+  const debounceTimeoutRef = useRef(null);
+
+  const loadFavorites = async () => {
+    try {
+      const storedFavorites = await AsyncStorage.getItem("favorites");
+      if (storedFavorites) {
+        const favoritesArray = JSON.parse(storedFavorites);
+        setFavoriteMovieIds(new Set(favoritesArray.map(movie => movie.id)));
+      }
+    } catch (error) {
+      console.error("Error loading favorite IDs:", error);
+    }
+  };
+
+  useEffect(() => {
+    loadFavorites();
+    const unsubscribe = navigation.addListener('focus', () => {
+      loadFavorites();
+    });
+    return unsubscribe;
+  }, [navigation]);
+
+  const fetchMovies = async (query) => {
+    if (!query.trim()) {
       setMovies([]);
-      setEndReached(false);
+      setLoading(false);
       return;
     }
 
+    setLoading(true);
     try {
-      setLoading(true)
-      const Data = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=76fb730da20c26bcd7d05575d7dcf0c6&query=${searchWord}`)
-      const films = await Data.json()
-      setMovies(films.results)
-      setEndReached(films.results.length === 0)
+      const res = await fetch(
+        `https://api.themoviedb.org/3/search/movie?api_key=76fb730da20c26bcd7d05575d7dcf0c6&query=${encodeURIComponent(query)}`
+      );
+      const data = await res.json();
+      setMovies(data.results);
     } catch (error) {
-      console.log(error)
+      console.error("Error fetching search results:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    const delay = setTimeout(() => {
-      handelSearch()
-    }, 100)
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
 
-    return () => clearTimeout(delay)
-  }, [searchWord])
+    if (searchWord.trim() !== "") {
+      setMovies([]);
+    }
+
+    debounceTimeoutRef.current = setTimeout(() => {
+      fetchMovies(searchWord);
+    }, 500);
+
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, [searchWord]);
+
+  const renderItem = ({ item }) => {
+    const isFav = favoriteMovieIds.has(item.id);
+    return (
+      <TouchableOpacity
+        onPress={() => navigation.navigate('Details', { movieId: item.id })}
+        activeOpacity={0.7}
+      >
+        <MovieCard item={item} isFavorite={isFav} />
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <SafeAreaView style={{ backgroundColor: '#fff', flex: 1 }}>
@@ -45,38 +95,34 @@ function Search() {
           onChangeText={(newWord) => setSearchWord(newWord)}
           placeholder='Search for your film...'
         />
-        <TouchableOpacity style={styles.btn} onPress={handelSearch}>
+        <TouchableOpacity style={styles.btn} onPress={() => fetchMovies(searchWord)}>
           <Text style={styles.btnText}>Search</Text>
         </TouchableOpacity>
       </View>
 
-      {searchWord && (
+      {searchWord.trim() !== "" && (
         <Text style={styles.searchWord}>Search result for <Text style={{ fontWeight: '600' }}>{searchWord}</Text></Text>
       )}
 
-      {loading && (
-        <ActivityIndicator size="large" color="#f5a623" style={{ marginTop: 5 }} />
-      )}
-
-      <FlatList
-        data={movies}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <MovieCard item={item} />}
-        contentContainerStyle={{ padding: 10 }}
-        numColumns={2}
-        onEndReached={() => setEndReached(true)}
-        onEndReachedThreshold={0.5}
-      />
-
-      {endReached && movies.length > 0 && (
-        <Text style={styles.endText}>No more results</Text>
+      {loading && movies.length === 0 ? (
+        <ActivityIndicator size="large" color="#f5a623" style={{ marginTop: 50 }} />
+      ) : (
+        <FlatList
+          data={movies}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderItem}
+          contentContainerStyle={{ padding: 10 }}
+          numColumns={2}
+        />
       )}
 
       {!loading && searchWord.trim() !== '' && movies.length === 0 && (
-        <Text style={styles.noResults}>Not found</Text>
+        <View style={styles.noResultsContainer}>
+          <Text style={styles.noResults}>Not found</Text>
+        </View>
       )}
     </SafeAreaView>
-  )
+  );
 }
 
 export default Search
@@ -128,6 +174,10 @@ const styles = StyleSheet.create({
   searchWord: {
     paddingLeft: 20,
     paddingBottom: 4
-  }
+  },
+  noResultsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 })
-
