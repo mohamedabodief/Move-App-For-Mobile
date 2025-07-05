@@ -4,6 +4,7 @@ import Svg, { Circle, Text as SvgText } from "react-native-svg";
 import { FontAwesome } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
 const MovieCard = React.memo(({ item }) => {
   const [isFavorite, setIsFavorite] = useState(false);
@@ -57,8 +58,14 @@ const MovieCard = React.memo(({ item }) => {
   );
 
   let strokeColor = vote >= 70 ? "green" : vote >= 40 ? "orange" : "red";
+    const navigation = useNavigation();
 
+  const handlePress = () => {
+    navigation.navigate('Details', { movieId: item.id });
+  };
   return (
+    <TouchableOpacity onPress={()=> handlePress()}>
+
     <View style={styles.card}>
       <Image
         source={{ uri: `https://image.tmdb.org/t/p/w500/${item.poster_path}` }}
@@ -117,6 +124,8 @@ const MovieCard = React.memo(({ item }) => {
         </View>
       </View>
     </View>
+    </TouchableOpacity>
+
   );
 });
 
